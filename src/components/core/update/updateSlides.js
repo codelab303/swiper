@@ -92,12 +92,12 @@ export default function updateSlides() {
           groupIndex === 0
             ? params.slidesPerGroup
             : Math.min(
-                Math.ceil(
-                  (slidesLength - groupIndex * slidesPerColumn * params.slidesPerGroup) /
-                    slidesPerColumn,
-                ),
-                params.slidesPerGroup,
-              );
+              Math.ceil(
+                (slidesLength - groupIndex * slidesPerColumn * params.slidesPerGroup) /
+                slidesPerColumn,
+              ),
+              params.slidesPerGroup,
+            );
         row = Math.floor(slideIndexInGroup / columnsInGroup);
         column = slideIndexInGroup - row * columnsInGroup + groupIndex * params.slidesPerGroup;
 
@@ -194,7 +194,19 @@ export default function updateSlides() {
     }
     slidesSizesGrid.push(slideSize);
 
-    if (params.centeredSlides) {
+    if (params.snapTo === 'end') {
+      if (i !== 0) slidePosition = slidePosition + slideSize + spaceBetween;
+      if (Math.abs(slidePosition) < 1 / 1000) slidePosition = 0;
+      if (params.roundLengths) slidePosition = Math.floor(slidePosition);
+      if (
+        (index - Math.min(swiper.params.slidesPerGroupSkip, index)) %
+        swiper.params.slidesPerGroup ===
+        0
+      )
+        snapGrid.push(Math.max(slidePosition - swiperSize, 0));
+      slidesGrid.push(Math.max(slidePosition - swiperSize, 0));
+      if (i === 0) slidePosition = slidePosition + slideSize + spaceBetween;
+    } else if (params.centeredSlides) {
       slidePosition = slidePosition + slideSize / 2 + prevSlideSize / 2 + spaceBetween;
       if (prevSlideSize === 0 && i !== 0)
         slidePosition = slidePosition - swiperSize / 2 - spaceBetween;
@@ -207,7 +219,7 @@ export default function updateSlides() {
       if (params.roundLengths) slidePosition = Math.floor(slidePosition);
       if (
         (index - Math.min(swiper.params.slidesPerGroupSkip, index)) %
-          swiper.params.slidesPerGroup ===
+        swiper.params.slidesPerGroup ===
         0
       )
         snapGrid.push(slidePosition);
